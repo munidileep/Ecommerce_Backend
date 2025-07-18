@@ -3,6 +3,7 @@ let bcrypt = require("bcrypt")
 let jwt = require("jsonwebtoken")
 const otpStore = {};
 const sendMail = require('../sendmail');
+require('dotenv').config();
 
 let reg = async (req, res) => {
     try {
@@ -28,7 +29,7 @@ let login = async (req, res) => {
         if (data) {
             let checking = await bcrypt.compare(req.body.pwd, data.pwd)
             if (checking) {
-                let token = jwt.sign({ "_id": data._id }, "key")
+                let token = jwt.sign({ "_id": data._id }, process.env.SECRET_KEY)
                 res.json({ "token": token, "_id": data._id, "name": data.name, "role": data.role, "address": data.address, "phno": data.phno, "gen": data.gen })
             }
             else {
@@ -46,7 +47,7 @@ let login = async (req, res) => {
 
 let auth = async(req,res,next)=>{
     try{
-        jwt.verify(req.headers.authorization, "key")
+        jwt.verify(req.headers.authorization, process.env.SECRET_KEY)
         next()
     }
     catch(err){
