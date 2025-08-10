@@ -7,8 +7,9 @@ require('dotenv').config();
 
 mongoose.connect(process.env.MONGO_URL).then(()=>{
     console.log("database is conneccted")
-}).catch(()=>{
-    console.log("database is not connected")
+}).catch((err)=>{
+    console.log(err)
+    process.exit(1);
 })
 
 let app = express()

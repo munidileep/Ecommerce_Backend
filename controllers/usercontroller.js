@@ -78,17 +78,20 @@ let forgotpass = async (req, res) => {
 
 const sendOtp = async (req, res) => {
     try {
-        const email = req.body._id
-        const user = await usermodel.findOne({ "_id": email });
-
-        if (!user) return res.json({ message: "User not found" });
+        let email = req.body._id
+        let forgot = req.body.forgot
+        if(forgot===true){
+            const user = await usermodel.findOne({ "_id": email });
+    
+            if (!user) return res.json({ message: "User not exist with email" });
+        }
 
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         const expires = Date.now() + 3 * 60 * 1000;         // OTP is valid for 3 min
 
         otpStore[email] = { otp, expires };
 
-        await sendMail(email, otp);
+        await sendMail(email, otp, forgot);
 
         res.json({ message: "OTP sent to your email" });
     } catch (err) {
@@ -113,7 +116,6 @@ const verifyOtp = (req, res) => {
         return res.json({ message: "Incorrect OTP" });
     }
 
-    delete otpStore[email]; // optional cleanup
     res.json({ message: "OTP verified successfully" });
 };
 
